@@ -1,4 +1,4 @@
-# Oracle SQL*Plus Ansible Collection
+# Oracle SQL Ansible Collection
 
 This Ansible collection provides modules and roles for interacting with Oracle databases using SQL*Plus.
 
