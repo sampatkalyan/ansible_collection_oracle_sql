@@ -1,0 +1,16 @@
+namespace: andavarapu
+name: oracle_sql
+version: 1.0.0
+readme: README.md
+authors:
+  - Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
+description: A collection containing an Oracle SQL modules. In Alpha
+license:
+  - GPL-3.0-or-later
+tags:
+  - database
+  - oracle
+repository: https://github.com/your_username/your_repo
+documentation: https://github.com/your_username/your_repo/blob/main/README.md
+homepage: https://github.com/your_username/your_repo
+issues: https://github.com/your_username/your_repo/issues
