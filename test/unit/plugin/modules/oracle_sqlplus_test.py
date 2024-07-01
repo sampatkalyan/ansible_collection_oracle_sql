@@ -1,3 +1,6 @@
+# Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
+# Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
+
 import pytest
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes

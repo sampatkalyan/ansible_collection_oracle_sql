@@ -20,7 +20,7 @@ See examples in the Usage section below.
 ## Installation
 
 ```bash
-ansible-galaxy collection install andavarapu.oracle_sql
+ansible-galaxy collection install sampatkalyan.oracle_sql
 ```
 
 ## Usage
