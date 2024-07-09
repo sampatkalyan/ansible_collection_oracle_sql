@@ -157,6 +157,57 @@ options:
             - Character set for SQL*Loader.
         required: false
         type: str
+    date_cache:
+        description:
+            - Specify the date cache size (in entries).
+        required: false
+        type: int
+    degree_of_parallelism:
+        description:
+            - Specify the degree of parallelism for the load operation.
+        required: false
+        type: int
+    direct_path_lock_wait:
+        description:
+            - Control direct path load behavior when waiting for table locks.
+        required: false
+        type: bool
+    empty_lobs_are_null:
+        description:
+            - Specify that empty LOBs should be treated as NULL.
+        required: false
+        type: bool
+    multithreading:
+        description:
+            - Enable multithreading for parallel loads.
+        required: false
+        type: bool
+    no_index_errors:
+        description:
+            - Specify whether indexing errors are tolerated during a direct path load.
+        required: false
+        type: bool
+    skip_index_maintenance:
+        description:
+            - Specify whether to skip index maintenance for direct path loads.
+        required: false
+        type: bool
+    skip_unusable_indexes:
+        description:
+            - Specify whether to skip unusable indexes during the load operation.
+        required: false
+        type: bool
+    streamsize:
+        description:
+            - Specify the size of the data stream sent from client to server.
+        required: false
+        type: str
+    trim:
+        description:
+            - Specify trimming behavior for text fields.
+        required: false
+        type: str
+        choices: ['LTRIM', 'RTRIM', 'BOTH', 'NOTRIM']
 requirements:
     - python >= 2.7
     - cx_Oracle
@@ -183,6 +234,9 @@ EXAMPLES = r'''
     skip: 10
     load: 1000
     silent: 'ERRORS'
+    date_cache: 1000
+    degree_of_parallelism: 4
+    empty_lobs_are_null: true
 
 - name: Load data using wallet authentication
   oracle_sqlloader:
@@ -195,6 +249,9 @@ EXAMPLES = r'''
     bad_file: /path/on/remote/host/bad.bad
     external_table: 'EXECUTE'
     charset: 'WE8MSWIN1252'
+    multithreading: true
+    streamsize: '256000'
+    trim: 'BOTH'
 '''
 
 RETURN = r'''
@@ -270,7 +327,7 @@ def parse_log_file(log_file):
     
     return records_loaded, records_rejected
 
-def main():
+def run_module():
     module_args = dict(
         username=dict(type='str', required=False),
         password=dict(type='str', required=False, no_log=True),
@@ -299,6 +356,16 @@ def main():
         scratch_dir=dict(type='str'),
         discard_file=dict(type='str'),
         charset=dict(type='str'),
+        date_cache=dict(type='int'),
+        degree_of_parallelism=dict(type='int'),
+        direct_path_lock_wait=dict(type='bool'),
+        empty_lobs_are_null=dict(type='bool'),
+        multithreading=dict(type='bool'),
+        no_index_errors=dict(type='bool'),
+        skip_index_maintenance=dict(type='bool'),
+        skip_unusable_indexes=dict(type='bool'),
+        streamsize=dict(type='str'),
+        trim=dict(type='str', choices=['LTRIM', 'RTRIM', 'BOTH', 'NOTRIM']),
     )
 
     result = dict(
@@ -347,56 +414,62 @@ def main():
         f'bad={module.params["bad_file"]}'
     ]
 
-    if module.params['wallet_location']:
-        cmd.append(f"wallet_location={module.params['wallet_location']}")
-    if module.params['wallet_password']:
-        cmd.append(f"wallet_password={module.params['wallet_password']}")
-    if module.params['direct']:
-        cmd.append('direct=true')
-    if module.params['parallel']:
-        cmd.append('parallel=true')
-    if module.params['skip']:
-        cmd.append(f'skip={module.params["skip"]}')
-    if module.params['load']:
-        cmd.append(f'load={module.params["load"]}')
-    if module.params['silent']:
-        cmd.append(f'silent={module.params["silent"]}')
-    if module.params['errors']:
-        cmd.append(f'errors={module.params["errors"]}')
-    if module.params['rows']:
-        cmd.append(f'rows={module.params["rows"]}')
-    if module.params['bindsize']:
-        cmd.append(f'bindsize={module.params["bindsize"]}')
-    if module.params['readsize']:
-        cmd.append(f'readsize={module.params["readsize"]}')
-    if module.params['external_table']:
-        cmd.append(f'external_table={module.params["external_table"]}')
-    if module.params['columnarrayrows']:
-        cmd.append(f'columnarrayrows={module.params["columnarrayrows"]}')
-    if module.params['parfile']:
-        cmd.append(f'parfile={module.params["parfile"]}')
-    if module.params['scratch_dir']:
-        cmd.append(f'scratch_dir={module.params["scratch_dir"]}')
-    if module.params['discard_file']:
-        cmd.append(f'discard={module.params["discard_file"]}')
-    if module.params['charset']:
-        cmd.append(f'charset={module.params["charset"]}')
+    # Add all the optional parameters
+    optional_params = [
+        ('wallet_location', 'wallet_location'),
+        ('wallet_password', 'wallet_password'),
+        ('direct', 'direct'),
+        ('parallel', 'parallel'),
+        ('skip', 'skip'),
+        ('load', 'load'),
+        ('silent', 'silent'),
+        ('errors', 'errors'),
+        ('rows', 'rows'),
+        ('bindsize', 'bindsize'),
+        ('readsize', 'readsize'),
+        ('external_table', 'external_table'),
+        ('columnarrayrows', 'columnarrayrows'),
+        ('parfile', 'parfile'),
+        ('scratch_dir', 'scratch_dir'),
+        ('discard_file', 'discard'),
+        ('charset', 'charset'),
+        ('date_cache', 'date_cache'),
+        ('degree_of_parallelism', 'degree_of_parallelism'),
+        ('direct_path_lock_wait', 'direct_path_lock_wait'),
+        ('empty_lobs_are_null', 'empty_lobs_are_null'),
+        ('multithreading', 'multithreading'),
+        ('no_index_errors', 'no_index_errors'),
+        ('skip_index_maintenance', 'skip_index_maintenance'),
+        ('skip_unusable_indexes', 'skip_unusable_indexes'),
+        ('streamsize', 'streamsize'),
+        ('trim', 'trim'),
+    ]
 
-    result['cmd'] = ' '.join(cmd)
+    for param, cmd_option in optional_params:
+        if module.params[param] is not None:
+            if isinstance(module.params[param], bool):
+                cmd.append(f'{cmd_option}={"true" if module.params[param] else "false"}')
+            else:
+                cmd.append(f'{cmd_option}={module.params[param]}')
 
-    stdout, stderr, rc = run_sqlloader(module, cmd)
-    
-    result['changed'] = True
-    result['message'] = 'SQL*Loader executed successfully'
-    result['stdout'] = stdout
-    result['stderr'] = stderr
-    result['rc'] = rc
+        result['cmd'] = ' '.join(cmd)
 
-    records_loaded, records_rejected = parse_log_file(module.params['log_file'])
-    result['records_loaded'] = records_loaded
-    result['records_rejected'] = records_rejected
+        stdout, stderr, rc = run_sqlloader(module, cmd)
 
-    module.exit_json(**result)
+        result['changed'] = True
+        result['message'] = 'SQL*Loader executed successfully'
+        result['stdout'] = stdout
+        result['stderr'] = stderr
+        result['rc'] = rc
+
+        records_loaded, records_rejected = parse_log_file(module.params['log_file'])
+        result['records_loaded'] = records_loaded
+        result['records_rejected'] = records_rejected
+
+        module.exit_json(**result)
+
+def main():
+    run_module()
 
 if __name__ == '__main__':
     main()
