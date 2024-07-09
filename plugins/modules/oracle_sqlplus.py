@@ -10,6 +10,13 @@ import logging
 import re
 from datetime import datetime
 
+ANSIBLE_METADATA = {
+    'metadata_version': '0.2',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
+
 # Initialize logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -22,7 +29,7 @@ description:
     - This module allows you to execute Oracle SQL*Plus scripts or raw SQL.
     - Supports substitution variables and environment variables.
     - Bind variables are supported only for raw SQL execution.
-version_added: "2.9"
+version_added: "1.0.0"
 options:
     username:
         description:

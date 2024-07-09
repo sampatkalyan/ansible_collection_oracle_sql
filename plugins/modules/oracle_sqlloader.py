@@ -6,11 +6,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-#ANSIBLE_METADATA = {
-#    'metadata_version': '1.1',
-#    'status': ['preview'],
-#    'supported_by': 'community'
-#}
+ANSIBLE_METADATA = {
+    'metadata_version': '0.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
 
 DOCUMENTATION = r'''
 ---
@@ -19,9 +20,7 @@ short_description: Load data into Oracle database using SQL*Loader
 description:
     - This module uses Oracle SQL*Loader to load data from a file into an Oracle database.
     - It provides various options to control the SQL*Loader operation.
-version_added: "1.0.0"
-author:
-    - "Your Name (@yourgithubhandle)"
+version_added: "0.0.1"
 options:
     username:
         description:
@@ -209,12 +208,15 @@ options:
         type: str
         choices: ['LTRIM', 'RTRIM', 'BOTH', 'NOTRIM']
 requirements:
-    - python >= 2.7
+    - python >= 2.7/Python 3.6+
     - cx_Oracle
 notes:
     - Requires Oracle SQL*Loader to be installed on the target machine.
     - The user running this module must have appropriate permissions to execute SQL*Loader.
     - All file paths should be on the remote host where SQL*Loader will be executed.
+    - It is strongly recommended to use Ansible Vault for sensitive information like passwords.
+author:
+    - Andavarapu Sampat Kalyan (@sampatkalyan)
 '''
 
 EXAMPLES = r'''
