@@ -19,13 +19,13 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: oracle_sql.sampatkalyan.oraclesql_table
+module: sampatkalyan.oracle_sql.oraclesql_table
 short_description: Manage Oracle database tables
 description:
     - Create, modify, or drop tables in an Oracle database.
     - Manage indexes, constraints, partitions, and other table properties.
     - This module is part of the oracle_sql collection (oracle_sql.sampatkalyan).
-version_added: "1.0.0"
+version_added: "0.0.1"
 options:
     hostname:
         description: The Oracle database host.
@@ -187,7 +187,7 @@ options:
 requirements:
     - cx_Oracle
 author:
-    - Your Name (@yourgithubusername)
+    - Andavarapu Sampat Kalyan (@sampatkalyan)
 '''
 
 EXAMPLES = r'''
