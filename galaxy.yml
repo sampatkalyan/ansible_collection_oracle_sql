@@ -1,12 +1,12 @@
-namespace: andavarapu
+namespace: sampatkalyan
 name: oracle_sql
-version: 1.0.0
+version: 0.0.1
 readme: README.md
 authors:
   - Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 description: A collection containing an Oracle SQL modules. In Alpha
 license:
-  - GPL-3.0-or-later
+  - Apache License 2.0
 tags:
   - database
   - oracle

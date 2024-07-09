@@ -219,6 +219,15 @@ def validate_input(module):
     if module.params['script'] and not os.path.exists(module.params['script']):
         module.fail_json(msg=f"SQL file {module.params['script']} not found")
 
+def check_sqlplus_installed(module):
+    """Check if SQL*Plus is installed."""
+    try:
+        subprocess.run(['sqlplus', '-V'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        module.fail_json(msg=f"SQL*Plus not installed or not found in PATH. Error: {e.stderr.decode('utf-8')}")
+    except FileNotFoundError:
+        module.fail_json(msg="SQL*Plus not installed or not found in PATH.")
+
 def execute_sqlplus(module, result):
     """Execute SQL*Plus command."""
     username = module.params['username']
@@ -374,6 +383,7 @@ def run_module():
 
     try:
         validate_input(module)
+        check_sqlplus_installed(module)
         
         if module.params['loop']:
             for item in module.params['loop']:
