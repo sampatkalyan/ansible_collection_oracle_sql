@@ -32,6 +32,7 @@ options:
             - The Oracle database password.
         required: false
         type: str
+        no_log: true
     sid:
         description:
             - The Oracle database SID.
@@ -62,6 +63,7 @@ options:
             - Password for Oracle Wallet if required.
         required: false
         type: str
+        no_log: true
     control_file:
         description:
             - The path to the SQL*Loader control file on the remote host.

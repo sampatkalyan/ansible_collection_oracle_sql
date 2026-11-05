@@ -47,6 +47,7 @@ options:
         description: The password for the database user.
         required: true
         type: str
+        no_log: true
     table_name:
         description: The name of the table to manage.
         required: true
