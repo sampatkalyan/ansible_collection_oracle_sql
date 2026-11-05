@@ -145,3 +145,4 @@ git merge maintenance/fixes
 git tag -a v0.0.2 -m "Release version 0.0.2: Namespace normalization, documentation, and security audit"
 git push origin main --tags
 ```
+

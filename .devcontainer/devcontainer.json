@@ -27,3 +27,4 @@
   "postCreateCommand": "echo 'Ansible Collection Dev Container Ready! Collections path: /workspaces'",
   "remoteUser": "vscode"
 }
+

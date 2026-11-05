@@ -34,3 +34,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Set ANSIBLE_COLLECTIONS_PATH so ansible tools discover the collection natively
 ENV ANSIBLE_COLLECTIONS_PATH=/workspaces
 ENV PYTHONPATH=/workspaces:$PYTHONPATH
+
