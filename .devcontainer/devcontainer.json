@@ -1,0 +1,29 @@
+{
+  "name": "Ansible Oracle SQL Collection Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/ansible_collections/sampatkalyan/oracle_sql,type=bind",
+  "workspaceFolder": "/workspaces/ansible_collections/sampatkalyan/oracle_sql",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "tests"
+        ],
+        "python.analysis.extraPaths": [
+          "/workspaces"
+        ]
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "redhat.ansible"
+      ]
+    }
+  },
+  "postCreateCommand": "echo 'Ansible Collection Dev Container Ready! Collections path: /workspaces'",
+  "remoteUser": "vscode"
+}

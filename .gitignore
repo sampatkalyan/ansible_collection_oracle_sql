@@ -6,3 +6,4 @@ __pycache__/
 .ansible/
 .venv/
 venv/
+.vscode/
