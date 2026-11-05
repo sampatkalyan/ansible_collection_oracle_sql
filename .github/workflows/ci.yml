@@ -1,0 +1,75 @@
+---
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sanity:
+    name: Sanity (Ansible ${{ matrix.ansible }} / Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: stable-2.16
+            python: "3.11"
+          - ansible: stable-2.17
+            python: "3.12"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          path: ansible_collections/sampatkalyan/oracle_sql
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Ansible (${{ matrix.ansible }})
+        run: pip install "https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz"
+
+      - name: Run sanity tests
+        working-directory: ansible_collections/sampatkalyan/oracle_sql
+        run: ansible-test sanity --docker -v --color --python ${{ matrix.python }}
+
+  unit:
+    name: Unit tests (Ansible ${{ matrix.ansible }} / Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ansible: stable-2.15
+            python: "3.10"
+          - ansible: stable-2.16
+            python: "3.11"
+          - ansible: stable-2.17
+            python: "3.12"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        with:
+          path: ansible_collections/sampatkalyan/oracle_sql
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Ansible (${{ matrix.ansible }})
+        run: pip install "https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz"
+
+      - name: Install test dependencies
+        run: pip install pytest
+
+      - name: Run unit tests
+        working-directory: ansible_collections/sampatkalyan/oracle_sql
+        run: ansible-test units --docker -v --color --python ${{ matrix.python }}
+
