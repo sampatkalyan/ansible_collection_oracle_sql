@@ -144,7 +144,7 @@ author:
 EXAMPLES = '''
 # Execute a SQL*Plus script with substitution variables
 - name: Run SQL*Plus script with substitution variables
-  oracle_sqlplus:
+  sampatkalyan.oracle_sql.oracle_sqlplus:
     script: "/path/to/sqlfile.sql"
     substitution_variables:
       - "value1"
@@ -154,7 +154,7 @@ EXAMPLES = '''
 
 # Execute raw SQL with bind variables using SQL*Plus
 - name: Run raw SQL with bind variables
-  oracle_sqlplus:
+  sampatkalyan.oracle_sql.oracle_sqlplus:
     raw_sql: "SELECT * FROM mytable WHERE column_name = :myVar"
     bind_variables:
       myVar: "value"
@@ -163,7 +163,7 @@ EXAMPLES = '''
 
 # Execute multiple SQL*Plus scripts and raw SQL in a loop
 - name: Run SQL*Plus scripts and raw SQL in a loop
-  oracle_sqlplus:
+  sampatkalyan.oracle_sql.oracle_sqlplus:
     loop:
       - script: "/path/to/sqlfile1.sql"
         substitution_variables:

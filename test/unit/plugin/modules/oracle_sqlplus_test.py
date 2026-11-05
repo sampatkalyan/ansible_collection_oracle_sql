@@ -6,7 +6,7 @@ from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
 #import ansible.module_utils.oracle_sqlplus as oracle_sqlplus
 from unittest.mock import patch, MagicMock
-from ansible_collections.andavarapu.oracle_sql.plugins.modules import oracle_sqlplus
+from ansible_collections.sampatkalyan.oracle_sql.plugins.modules import oracle_sqlplus
 
 def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""

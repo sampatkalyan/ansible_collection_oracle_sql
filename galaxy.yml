@@ -10,7 +10,7 @@ license:
 tags:
   - database
   - oracle
-repository: https://github.com/your_username/your_repo
-documentation: https://github.com/your_username/your_repo/blob/main/README.md
-homepage: https://github.com/your_username/your_repo
-issues: https://github.com/your_username/your_repo/issues
+repository: https://github.com/sampatkalyan/ansible_collection_oracle_sql
+documentation: https://github.com/sampatkalyan/ansible_collection_oracle_sql/blob/main/README.md
+homepage: https://github.com/sampatkalyan/ansible_collection_oracle_sql
+issues: https://github.com/sampatkalyan/ansible_collection_oracle_sql/issues

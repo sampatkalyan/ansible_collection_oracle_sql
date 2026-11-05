@@ -24,7 +24,7 @@ short_description: Manage Oracle database tables
 description:
     - Create, modify, or drop tables in an Oracle database.
     - Manage indexes, constraints, partitions, and other table properties.
-    - This module is part of the oracle_sql collection (oracle_sql.sampatkalyan).
+    - This module is part of the oracle_sql collection (sampatkalyan.oracle_sql).
 version_added: "0.0.1"
 options:
     hostname:
@@ -192,7 +192,7 @@ author:
 
 EXAMPLES = r'''
 - name: Create users table with advanced features
-  oracle_sql.sampatkalyan.oraclesql_table:
+  sampatkalyan.oracle_sql.oraclesql_table:
     hostname: localhost
     port: 1521
     service_name: ORCLCDB
@@ -243,7 +243,7 @@ EXAMPLES = r'''
     comment: "Table for storing user information"
 
 - name: Drop users table
-  oracle_sql.sampatkalyan.oraclesql_table:
+  sampatkalyan.oracle_sql.oraclesql_table:
     hostname: localhost
     port: 1521
     service_name: ORCLCDB

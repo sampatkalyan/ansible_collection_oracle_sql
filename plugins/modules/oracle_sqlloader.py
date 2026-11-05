@@ -221,7 +221,7 @@ author:
 
 EXAMPLES = r'''
 - name: Load data into Oracle database
-  oracle_sqlloader:
+  sampatkalyan.oracle_sql.oracle_sqlloader:
     username: system
     password: oracle
     sid: ORCL
@@ -241,7 +241,7 @@ EXAMPLES = r'''
     empty_lobs_are_null: true
 
 - name: Load data using wallet authentication
-  oracle_sqlloader:
+  sampatkalyan.oracle_sql.oracle_sqlloader:
     connection_string: '@mydb'
     wallet_location: /path/to/wallet
     wallet_password: walletpass

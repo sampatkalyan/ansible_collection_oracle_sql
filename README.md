@@ -31,7 +31,7 @@ ansible-galaxy collection install sampatkalyan.oracle_sql
 
 ```yaml
 - name: Run SQL*Plus script with substitution variables
-  andavarapu.oracle_sql.oracle_sqlplus:
+  sampatkalyan.oracle_sql.oracle_sqlplus:
     script: "/path/to/sqlfile.sql"
     substitution_variables:
       - "value1"
@@ -44,7 +44,7 @@ ansible-galaxy collection install sampatkalyan.oracle_sql
 
 ```yaml
 - name: Run raw SQL with bind variables
-  andavarapu.oracle_sql.oracle_sqlplus:
+  sampatkalyan.oracle_sql.oracle_sqlplus:
     raw_sql: "SELECT * FROM mytable WHERE column_name = :myVar"
     bind_variables:
       myVar: "value"
