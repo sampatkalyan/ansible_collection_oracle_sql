@@ -11,8 +11,7 @@ fi
 echo "Building collection..."
 ansible-galaxy collection build --force
 
-TARBALL=$(ls sampatkalyan-oracle_sql-*.tar.gz | head -n 1)
+TARBALL=$(find . -maxdepth 1 -name "sampatkalyan-oracle_sql-*.tar.gz" | head -n 1)
 echo "Publishing $TARBALL to Ansible Galaxy..."
 ansible-galaxy collection publish "$TARBALL" --api-key "$GALAXY_API_KEY"
 echo "Published successfully!"
-

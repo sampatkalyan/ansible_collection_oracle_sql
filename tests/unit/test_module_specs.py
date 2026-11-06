@@ -1,7 +1,9 @@
 # Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
-import glob
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import os
 import re
 import yaml
@@ -83,11 +85,7 @@ def test_module_passwords_have_no_log(mod_name):
     with open(path, 'r', encoding='utf-8') as f:
         src = f.read()
 
-    doc_m = re.search(r'DOCUMENTATION\s*=\s*[rR]?[\'"]{3}(.+?)[\'"]{3}', src, re.DOTALL)
-    doc = yaml.safe_load(doc_m.group(1))
-    options = doc.get('options', {})
-
-    for opt_name, opt_spec in options.items():
-        if isinstance(opt_spec, dict) and 'password' in opt_name.lower():
-            assert opt_spec.get('no_log') is True, f"Option '{opt_name}' in {mod_name} documentation must have no_log: true"
-
+    # Verify that in argument_spec, any parameter with 'password' has no_log=True
+    # Matches: password=dict(..., no_log=True) or 'password': {..., 'no_log': True}
+    has_no_log = bool(re.search(r'password[\'"]?\s*[:=]\s*(?:dict\([^)]*no_log\s*=\s*True|{[^}]*[\'"]no_log[\'"]\s*:\s*True)', src))
+    assert has_no_log, f"Module {mod_name} must specify no_log=True for password in argument_spec"

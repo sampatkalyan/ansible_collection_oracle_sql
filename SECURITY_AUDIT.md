@@ -1,8 +1,8 @@
 # Security Audit: Credential Handling and Secret Leakage
 
-**Repository**: `ansible_collection_oracle_sql` (`sampatkalyan.oracle_sql`)  
-**Audit Date**: November 2026  
-**Auditor**: Automated Code Review & Security Analysis  
+**Repository**: `ansible_collection_oracle_sql` (`sampatkalyan.oracle_sql`)
+**Audit Date**: November 2026
+**Auditor**: Automated Code Review & Security Analysis
 **Scope**: `plugins/modules/oracle_sqlplus.py` and related collection modules (`oracle_sqlloader.py`, `oraclesql_database.py`, `oraclesql_table.py`, `oraclesql_user.py`).
 
 ---
@@ -34,7 +34,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **CRITICAL**
 - **File**: `plugins/modules/oracle_sqlplus.py`
 - **Lines**: 286–291, 300
-- **Description**:  
+- **Description**:
   Lines 286–291 construct the connection string:
   ```python
   if username and password and database:
@@ -45,9 +45,9 @@ In `plugins/modules/oracle_sqlplus.py`:
   sqlplus_cmd.append(conn_str)
   ```
   This command list is executed via `subprocess.Popen(sqlplus_cmd, ...)`.
-- **Impact**:  
+- **Impact**:
   On multi-user Unix/Linux hosts, any local user or non-privileged process running `ps -ef`, `ps aux`, inspecting `/proc/<pid>/cmdline`, or querying OS process tables on Windows (`tasklist`, `Get-Process`, Process Explorer) can observe the database password in plaintext during SQL*Plus execution.
-- **Recommendation**:  
+- **Recommendation**:
   Invoke SQL*Plus with the `/NOLOG` flag and send the connection command via `stdin` before executing the user's SQL script:
   ```text
   CONNECT username/password@database
@@ -60,7 +60,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **HIGH**
 - **File**: `plugins/modules/oracle_sqlloader.py`
 - **Lines**: 405–417, 457, 471
-- **Description**:  
+- **Description**:
   The module builds the command line including the plaintext password:
   ```python
   conn = f"{module.params['username']}/{module.params['password']}@{module.params['host']}:{module.params['port']}/{module.params['sid']}"
@@ -76,9 +76,9 @@ In `plugins/modules/oracle_sqlplus.py`:
   ```python
   module.fail_json(msg="SQL*Loader failed", rc=proc.returncode, stdout=stdout, stderr=stderr, cmd=' '.join(cmd))
   ```
-- **Impact**:  
+- **Impact**:
   Ansible displays module return values in execution output when running with `-v` / `-vvv` or registers them into playbook variables. Anyone with access to Ansible controller logs, CI logs, or AWX/Automation Controller job outputs will see the password. Furthermore, `cmd` exposes credentials in `ps` just like Finding 1.
-- **Recommendation**:  
+- **Recommendation**:
   Redact or omit credentials from `result['cmd']` (e.g., `f"userid={username}/******@{host}..."`). Avoid passing credentials on the CLI; use a parameter file (`parfile`) with restricted file permissions or Oracle Wallet.
 
 ---
@@ -87,7 +87,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **MEDIUM**
 - **File**: `plugins/modules/oraclesql_user.py`
 - **Lines**: 28, 47, 52
-- **Description**:  
+- **Description**:
   In `plugins/modules/oraclesql_user.py`, SQL statements are formatted with plaintext passwords:
   ```python
   query = f"CREATE USER {username} IDENTIFIED BY {password}"
@@ -97,9 +97,9 @@ In `plugins/modules/oracle_sqlplus.py`:
   ```python
   module.fail_json(msg=f"Failed to execute SQL query: {query}. Error: {e}")
   ```
-- **Impact**:  
+- **Impact**:
   If user creation or alteration fails (e.g., password does not satisfy Oracle password complexity rules, tablespace quota issue, or permission error), the failed SQL statement containing the plaintext password is included in `msg` and emitted in Ansible failure logs.
-- **Recommendation**:  
+- **Recommendation**:
   Mask or sanitize sensitive queries before including them in error messages:
   ```python
   safe_query = re.sub(r'IDENTIFIED BY \S+', 'IDENTIFIED BY ******', query)
@@ -112,7 +112,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **MEDIUM**
 - **File**: `plugins/modules/oraclesql_table.py`
 - **Lines**: 568, 616, 625
-- **Description**:  
+- **Description**:
   Line 616 assigns all module parameters directly into the result dictionary:
   ```python
   result['table'] = module.params
@@ -120,9 +120,9 @@ In `plugins/modules/oracle_sqlplus.py`:
   module.exit_json(**result)
   ```
   `module.params` includes `password`.
-- **Impact**:  
+- **Impact**:
   Although Ansible core filters parameters marked with `no_log=True` in standard result output, returning raw parameter dictionaries into custom subkeys can bypass certain output filters or leak passwords into registered variables and debug tasks.
-- **Recommendation**:  
+- **Recommendation**:
   Do not copy `module.params` into `result['table']`. Construct the table descriptor explicitly, omitting `password`, `user`, and other connection parameters.
 
 ---
@@ -131,15 +131,15 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **MEDIUM**
 - **File**: `plugins/modules/oracle_sqlplus.py`
 - **Lines**: 372, 395–401
-- **Description**:  
+- **Description**:
   The `loop` option is defined as:
   ```python
   loop=dict(type='list', elements='dict', required=False, default=[])
   ```
   In lines 396–401, `temp_params.update(item)` merges loop items into module parameters. If a playbook specifies `password` inside a loop element, Ansible's argument parser cannot know that the sub-key `password` within `loop` is sensitive because `loop` lacks an explicit sub-argument spec (`options=...`).
-- **Impact**:  
+- **Impact**:
   Playbook task invocations passing per-item passwords in `loop` can have passwords printed in task logs unless the user sets `no_log: true` at the task level.
-- **Recommendation**:  
+- **Recommendation**:
   Either specify full `options` dictionary for `loop` with `no_log=True` on sensitive keys or recommend using task-level `loop:` in Ansible playbooks instead of an internal module-level `loop` argument.
 
 ---
@@ -148,7 +148,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **LOW / FUNCTIONAL RISK**
 - **File**: `plugins/modules/oracle_sqlplus.py`
 - **Lines**: 264–272
-- **Description**:  
+- **Description**:
   Bind variables are substituted into `raw_sql` using string replacement:
   ```python
   if raw_sql and bind_variables:
@@ -161,9 +161,9 @@ In `plugins/modules/oracle_sqlplus.py`:
       subst_var = f'&{i}'
       sql_script = sql_script.replace(subst_var, str(value))
   ```
-- **Impact**:  
+- **Impact**:
   This does not provide true database bind variable isolation. Values containing single quotes or SQL control sequences can lead to syntax errors or unintended SQL command execution.
-- **Recommendation**:  
+- **Recommendation**:
   Document that `bind_variables` in `oracle_sqlplus` performs client-side string substitution, or consider escaping single quotes (`value.replace("'", "''")`).
 
 ---
@@ -172,7 +172,7 @@ In `plugins/modules/oracle_sqlplus.py`:
 - **Severity**: **LOW**
 - **File**: `plugins/modules/oracle_sqlplus.py`
 - **Lines**: 286–290
-- **Description**:  
+- **Description**:
   Line 286 requires all three of `username`, `password`, and `database` to be non-empty:
   ```python
   if username and password and database:
@@ -180,9 +180,9 @@ In `plugins/modules/oracle_sqlplus.py`:
   else:
       conn_str = '/ as sysdba' if sysdba else '/ as sysoper' if sysoper else ''
   ```
-- **Impact**:  
+- **Impact**:
   If a user specifies `username` and `password` without `database` (intending a local Oracle connection using `ORACLE_SID`), `conn_str` silently falls back to `""` or `'/'`, dropping the supplied username and password completely.
-- **Recommendation**:  
+- **Recommendation**:
   Support `username` and `password` without `database`:
   ```python
   if username and password:

@@ -25,33 +25,39 @@ options:
         description:
             - Name of the Oracle database.
         required: true
+        type: str
     state:
         description:
             - State of the database (`present` or `absent`).
         choices: ['present', 'absent']
         required: true
+        type: str
     db_type:
         description:
             - Type of the database (`CDB` or `PDB`).
         choices: ['CDB', 'PDB']
         required: true
+        type: str
     oracle_home:
         description:
             - Path to the Oracle Home directory.
         required: true
+        type: str
     oracle_sid:
         description:
             - Oracle System Identifier (SID) for the database.
         required: true
+        type: str
     db_admin_user:
         description:
             - Administrative user for database operations.
         required: true
+        type: str
     db_admin_password:
         description:
             - Password for the administrative user.
         required: true
-        no_log: true
+        type: str
 requirements:
     - cx_Oracle
 author:
@@ -86,18 +92,23 @@ RETURN = r'''
 changed:
     description: Whether the state of the database was changed.
     type: bool
+    returned: always
 msg:
     description: Message describing the result of the operation.
     type: str
+    returned: always
 db_name:
     description: Name of the Oracle database affected by the operation.
     type: str
+    returned: always
 state:
     description: State of the database after the operation ('present' or 'absent').
     type: str
+    returned: always
 db_type:
     description: Type of the database affected (CDB or PDB).
     type: str
+    returned: always
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -178,4 +189,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

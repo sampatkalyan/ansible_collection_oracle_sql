@@ -1,3 +1,6 @@
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import sys
 from unittest.mock import MagicMock
 
@@ -20,5 +23,3 @@ if 'cx_Oracle' not in sys.modules:
         mock_cx.Error = type('Error', (Exception,), {})
         mock_cx.makedsn = MagicMock(return_value='localhost:1521/ORCL')
         sys.modules['cx_Oracle'] = mock_cx
-
-

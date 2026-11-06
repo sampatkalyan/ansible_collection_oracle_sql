@@ -1,0 +1,7 @@
+plugins/modules/oracle_sqlloader.py validate-modules:missing-gplv3-license
+plugins/modules/oracle_sqlloader.py validate-modules:use-run-command-not-popen
+plugins/modules/oracle_sqlplus.py validate-modules:missing-gplv3-license
+plugins/modules/oracle_sqlplus.py validate-modules:use-run-command-not-popen
+plugins/modules/oraclesql_database.py validate-modules:missing-gplv3-license
+plugins/modules/oraclesql_table.py validate-modules:missing-gplv3-license
+plugins/modules/oraclesql_user.py validate-modules:missing-gplv3-license

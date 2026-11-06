@@ -33,7 +33,6 @@ options:
             - The password to connect to the Oracle database.
         required: false
         type: str
-        no_log: true
     database:
         description:
             - The database connect string.
@@ -300,7 +299,6 @@ def execute_sqlplus(module, result):
     # Prepare environment variables
     env = os.environ.copy()
     env.update(env_variables)
-
 
     # Execute SQL script using SQL*Plus
     start_time = datetime.now()

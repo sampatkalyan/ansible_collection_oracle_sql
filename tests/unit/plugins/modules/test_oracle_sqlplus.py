@@ -1,6 +1,9 @@
 # Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import json
 from unittest.mock import patch, MagicMock, mock_open
 import pytest

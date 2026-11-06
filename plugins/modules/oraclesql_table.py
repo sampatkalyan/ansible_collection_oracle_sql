@@ -42,7 +42,6 @@ options:
         description: The password for the database user.
         required: true
         type: str
-        no_log: true
     table_name:
         description: The name of the table to manage.
         required: true
@@ -168,11 +167,9 @@ options:
     compress:
         description: Whether to enable table compression.
         type: bool
-        default: false
     row_movement:
         description: Whether to enable row movement for partitioned tables.
         type: bool
-        default: false
     gather_stats:
         description: Whether to gather statistics after table creation or modification.
         type: bool
@@ -483,7 +480,7 @@ def modify_table(cursor, table_name, desired_state):
     for index in desired_state.get('indexes', []):
         if index['name'] not in existing_indexes:
             unique = "UNIQUE " if index.get('unique') else ""
-            index_type = f"BITMAP " if index.get('type') == 'BITMAP' else ""
+            index_type = "BITMAP " if index.get('type') == 'BITMAP' else ""
             columns = ", ".join(index['columns'])
             cursor.execute(f"CREATE {unique}{index_type}INDEX {index['name']} ON {table_name} ({columns})")
         else:
@@ -493,7 +490,7 @@ def modify_table(cursor, table_name, desired_state):
                existing_index['columns'] != index['columns']:
                 cursor.execute(f"DROP INDEX {index['name']}")
                 unique = "UNIQUE " if index.get('unique') else ""
-                index_type = f"BITMAP " if index.get('type') == 'BITMAP' else ""
+                index_type = "BITMAP " if index.get('type') == 'BITMAP' else ""
                 columns = ", ".join(index['columns'])
                 cursor.execute(f"CREATE {unique}{index_type}INDEX {index['name']} ON {table_name} ({columns})")
 
@@ -567,7 +564,7 @@ def run_module():
             unique=dict(type='bool', default=False),
             type=dict(type='str', choices=['BTREE', 'BITMAP'], default='BTREE')
         )),
-        foreign_keys=dict(type='list', elements='dict', options=dict(
+        foreign_keys=dict(type='list', elements='dict', no_log=False, options=dict(
             name=dict(type='str', required=True),
             columns=dict(type='list', elements='str', required=True),
             reference_table=dict(type='str', required=True),
@@ -659,4 +656,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

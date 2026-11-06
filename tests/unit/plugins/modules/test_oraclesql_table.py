@@ -1,6 +1,9 @@
 # Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 import json
 import sys
 from unittest.mock import patch, MagicMock
@@ -166,5 +169,3 @@ def test_table_fails_when_cx_oracle_missing(monkeypatch):
         oraclesql_table.main()
     msg = ex.value.args[0]['msg']
     assert "cx_Oracle" in msg
-
-

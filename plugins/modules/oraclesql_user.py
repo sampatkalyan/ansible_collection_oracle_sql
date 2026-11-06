@@ -36,7 +36,6 @@ options:
             - The password for the user.
         required: true
         type: str
-        no_log: true
     state:
         description:
             - The desired state of the user.
@@ -154,7 +153,7 @@ def create_or_update_user(module, connection):
 
     elif state == 'absent':
         # Delete the user if it exists
-        query = f"SELECT COUNT(*) FROM dba_users WHERE username = :username"
+        query = "SELECT COUNT(*) FROM dba_users WHERE username = :username"
         cursor = execute_sql_query(module, connection, query, {'username': username})
         user_exists = cursor.fetchone()[0]
 
@@ -197,4 +196,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

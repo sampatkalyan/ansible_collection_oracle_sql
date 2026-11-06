@@ -72,4 +72,3 @@ jobs:
       - name: Run unit tests
         working-directory: ansible_collections/sampatkalyan/oracle_sql
         run: ansible-test units --docker -v --color --python ${{ matrix.python }}
-
