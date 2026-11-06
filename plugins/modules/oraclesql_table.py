@@ -290,8 +290,9 @@ import cx_Oracle
 from ansible.module_utils.basic import AnsibleModule
 
 def create_table(cursor, table_info):
+    table_name = table_info.get('table_name') or table_info.get('name')
     columns = []
-    for col in table_info['columns']:
+    for col in table_info.get('columns', []):
         col_def = f"{col['name']} {col['type']}"
         if not col.get('nullable', True):
             col_def += " NOT NULL"
@@ -301,11 +302,11 @@ def create_table(cursor, table_info):
             col_def += f" CHECK ({col['check']})"
         columns.append(col_def)
     
-    primary_key = next((col['name'] for col in table_info['columns'] if col.get('primary_key')), None)
+    primary_key = next((col['name'] for col in table_info.get('columns', []) if col.get('primary_key')), None)
     if primary_key:
-        columns.append(f"CONSTRAINT pk_{table_info['name']} PRIMARY KEY ({primary_key})")
+        columns.append(f"CONSTRAINT pk_{table_name} PRIMARY KEY ({primary_key})")
     
-    query = f"CREATE {'TEMPORARY ' if table_info.get('temporary') else ''}TABLE {table_info['name']} ({', '.join(columns)})"
+    query = f"CREATE {'TEMPORARY ' if table_info.get('temporary') else ''}TABLE {table_name} ({', '.join(columns)})"
     
     if table_info.get('tablespace'):
         query += f" TABLESPACE {table_info['tablespace']}"
@@ -330,12 +331,12 @@ def create_table(cursor, table_info):
     
     cursor.execute(query)
     
-    for col in table_info['columns']:
+    for col in table_info.get('columns', []):
         if col.get('comment'):
-            cursor.execute(f"COMMENT ON COLUMN {table_info['name']}.{col['name']} IS '{col['comment']}'")
+            cursor.execute(f"COMMENT ON COLUMN {table_name}.{col['name']} IS '{col['comment']}'")
     
     if table_info.get('comment'):
-        cursor.execute(f"COMMENT ON TABLE {table_info['name']} IS '{table_info['comment']}'")
+        cursor.execute(f"COMMENT ON TABLE {table_name} IS '{table_info['comment']}'")
 
 def drop_table(cursor, table_name):
     cursor.execute(f"DROP TABLE {table_name} PURGE")

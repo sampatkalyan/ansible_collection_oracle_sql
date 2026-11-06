@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Comprehensive unit test coverage for all collection modules (`test_oracle_sqlloader.py`, `test_oraclesql_database.py`, `test_oraclesql_table.py`, `test_oraclesql_user.py`, and `test_module_specs.py`), establishing 51 passing unit and specification tests.
+- Cross-platform test compatibility shims (`tests/conftest.py`) allowing tests to run natively on Windows while remaining fully compatible with Linux CI.
+
 ### Changed
 - Harmonized `ANSIBLE_METADATA` across all 5 modules (`oracle_sqlloader`, `oracle_sqlplus`, `oraclesql_database`, `oraclesql_table`, `oraclesql_user`) to canonical schema version `1.1` (`preview` status, `community` support).
 - Standardized module headers with `# -*- coding: utf-8 -*-`, `from __future__ import absolute_import, division, print_function`, and `__metaclass__ = type`.
@@ -16,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronized Ansible version requirement in `README.md` to `>= 2.15.0` matching `meta/runtime.yml`.
 
 ### Fixed
+- Fixed `KeyError: 'name'` in `oraclesql_table.py` by resolving `table_name` correctly from module parameters in `create_table()`.
+- Fixed indentation bug in `oracle_sqlloader.py` where command execution was prematurely nested inside the optional parameter assembly loop.
 - Removed unsupported `documentation` and `examples` keyword arguments from `AnsibleModule(...)` instantiation in `oraclesql_database.py` which caused runtime `TypeError` and language server errors.
 
 ## [0.0.2] - 2026-11-06

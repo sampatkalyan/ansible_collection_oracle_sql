@@ -456,21 +456,21 @@ def run_module():
             else:
                 cmd.append(f'{cmd_option}={module.params[param]}')
 
-        result['cmd'] = ' '.join(cmd)
+    result['cmd'] = ' '.join(cmd)
 
-        stdout, stderr, rc = run_sqlloader(module, cmd)
+    stdout, stderr, rc = run_sqlloader(module, cmd)
 
-        result['changed'] = True
-        result['message'] = 'SQL*Loader executed successfully'
-        result['stdout'] = stdout
-        result['stderr'] = stderr
-        result['rc'] = rc
+    result['changed'] = True
+    result['message'] = 'SQL*Loader executed successfully'
+    result['stdout'] = stdout
+    result['stderr'] = stderr
+    result['rc'] = rc
 
-        records_loaded, records_rejected = parse_log_file(module.params['log_file'])
-        result['records_loaded'] = records_loaded
-        result['records_rejected'] = records_rejected
+    records_loaded, records_rejected = parse_log_file(module.params['log_file'])
+    result['records_loaded'] = records_loaded
+    result['records_rejected'] = records_rejected
 
-        module.exit_json(**result)
+    module.exit_json(**result)
 
 def main():
     run_module()
