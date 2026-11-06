@@ -1,4 +1,81 @@
 #!/usr/bin/python
+# Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
+# Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+DOCUMENTATION = r'''
+---
+module: oraclesql_user
+short_description: Manage Oracle database users
+description:
+    - Manage Oracle database users, including creating, updating passwords, altering privileges, and dropping users.
+version_added: "0.0.1"
+options:
+    connect_string:
+        description:
+            - The Oracle connection string.
+        required: true
+        type: str
+    username:
+        description:
+            - The username of the Oracle user to manage.
+        required: true
+        type: str
+    password:
+        description:
+            - The password for the user.
+        required: true
+        type: str
+        no_log: true
+    state:
+        description:
+            - The desired state of the user.
+        choices: ['present', 'absent']
+        required: true
+        type: str
+    privileges:
+        description:
+            - A list of system privileges or roles to grant to the user.
+        required: false
+        type: list
+        elements: str
+requirements:
+    - cx_Oracle
+author:
+    - Andavarapu Sampat Kalyan (@sampatkalyan)
+'''
+
+EXAMPLES = r'''
+- name: Create an Oracle database user
+  sampatkalyan.oracle_sql.oraclesql_user:
+    connect_string: "system/manager@localhost:1521/XEPDB1"
+    username: testuser
+    password: testpassword
+    state: present
+    privileges:
+      - CREATE SESSION
+      - CREATE TABLE
+
+- name: Drop an Oracle database user
+  sampatkalyan.oracle_sql.oraclesql_user:
+    connect_string: "system/manager@localhost:1521/XEPDB1"
+    username: testuser
+    password: testpassword
+    state: absent
+'''
+
+RETURN = r'''
+changed:
+    description: Whether any changes were made.
+    type: bool
+    returned: always
+msg:
+    description: Informational message about the operation.
+    type: str
+    returned: always
+'''
 
 from ansible.module_utils.basic import AnsibleModule
 import cx_Oracle
@@ -80,8 +157,7 @@ def main():
         'username': {'type': 'str', 'required': True},
         'password': {'type': 'str', 'required': True, 'no_log': True},
         'state': {'type': 'str', 'required': True, 'choices': ['present', 'absent']},
-        'privileges': {'type': 'list'},
-        # Add more parameters as needed
+        'privileges': {'type': 'list', 'elements': 'str'},
     }
 
     module = AnsibleModule(

@@ -30,3 +30,4 @@ jobs:
         env:
           GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
         run: ansible-galaxy collection publish sampatkalyan-oracle_sql-*.tar.gz --api-key "$GALAXY_API_KEY"
+

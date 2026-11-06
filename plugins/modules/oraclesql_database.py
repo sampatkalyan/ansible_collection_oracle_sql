@@ -18,7 +18,7 @@ import cx_Oracle
 
 DOCUMENTATION = '''
 ---
-module: sampatkalyan.oracle_sql.oraclesql_database
+module: oraclesql_database
 short_description: Manage Oracle databases (CDB and PDB).
 description:
     - Manage Oracle databases including creating and dropping both Container Databases (CDB) and Pluggable Databases (PDB).

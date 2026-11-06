@@ -15,3 +15,4 @@ TARBALL=$(ls sampatkalyan-oracle_sql-*.tar.gz | head -n 1)
 echo "Publishing $TARBALL to Ansible Galaxy..."
 ansible-galaxy collection publish "$TARBALL" --api-key "$GALAXY_API_KEY"
 echo "Published successfully!"
+

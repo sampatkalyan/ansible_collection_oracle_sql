@@ -19,7 +19,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: sampatkalyan.oracle_sql.oraclesql_table
+module: oraclesql_table
 short_description: Manage Oracle database tables
 description:
     - Create, modify, or drop tables in an Oracle database.
