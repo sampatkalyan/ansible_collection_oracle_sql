@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-11-06
+
+### Added
+- Added fallback `missing_required_lib('cx_Oracle')` handling across `oraclesql_database`, `oraclesql_table`, and `oraclesql_user` for graceful failure with standard Ansible error reporting when `cx_Oracle` is not installed.
+- Added versioned sanity ignore configurations (`tests/sanity/ignore-2.15.txt`, `ignore-2.16.txt`, `ignore-2.17.txt`) to formally declare Apache 2.0 license validation exceptions per Ansible Galaxy certification standards.
+- Added unit tests for missing `cx_Oracle` library verification across database, table, and user modules (expanding suite to 54 passing tests).
+
+### Changed
+- Aligned module YAML `DOCUMENTATION` blocks with strict Ansible schema specifications:
+  - Removed invalid `no_log: true` keys from YAML documentation options (retaining mandatory `no_log=True` enforcement in runtime `argument_spec`).
+  - Added explicit parameter types (`type: str`) and return metadata (`returned: always`) to `oraclesql_database`.
+  - Synchronized documentation parameter defaults with code definitions for `compress` and `row_movement` in `oraclesql_table`.
+  - Added explicit `no_log=False` to `foreign_keys` in `oraclesql_table` to prevent heuristic credential false positives.
+- Standardized test boilerplate with `from __future__ import (absolute_import, division, print_function)` and `__metaclass__ = type` across all test files.
+- Enforced Unix LF line endings repository-wide via `.gitattributes`.
+
+### Removed
+- Removed obsolete `plugins/modules/__init__.py` and root `__init__.py` to align with canonical Ansible collection architecture and eliminate IDE language server warnings.
+
 ## [0.0.3] - 2026-11-06
 
 ### Added
