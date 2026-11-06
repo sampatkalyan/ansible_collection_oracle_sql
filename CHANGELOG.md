@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected `oracle_sqlloader` requirements documentation to specify `Oracle Instant Client (sqlldr)` instead of `cx_Oracle`.
 - Synchronized Ansible version requirement in `README.md` to `>= 2.15.0` matching `meta/runtime.yml`.
 
+### Fixed
+- Removed unsupported `documentation` and `examples` keyword arguments from `AnsibleModule(...)` instantiation in `oraclesql_database.py` which caused runtime `TypeError` and language server errors.
+
 ## [0.0.2] - 2026-11-06
 
 ### Added

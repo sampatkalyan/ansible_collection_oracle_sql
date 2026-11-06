@@ -147,9 +147,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True,
-        documentation=DOCUMENTATION,
-        examples=EXAMPLES
+        supports_check_mode=True
     )
 
     db_name = module.params['db_name']
