@@ -22,7 +22,7 @@ ansible-galaxy collection install sampatkalyan.oracle_sql
 
 ## Requirements
 
-- **Ansible** >= 2.9
+- **Ansible** >= 2.15.0
 - **Python** >= 3.6 on the control node
 - **Oracle Instant Client** with SQL\*Plus and/or SQL\*Loader on the target host (for `oracle_sqlplus` and `oracle_sqlloader` modules)
 - **cx\_Oracle** Python library (for `oraclesql_database`, `oraclesql_table`, and `oraclesql_user` modules)

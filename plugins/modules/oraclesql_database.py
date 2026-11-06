@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
@@ -6,15 +8,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
+    'metadata_version': '1.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
 
-from ansible.module_utils.basic import AnsibleModule
-import cx_Oracle
-
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: oraclesql_database
 short_description: Manage Oracle databases (CDB and PDB).
@@ -59,7 +58,7 @@ author:
     - Andavarapu Sampat Kalyan (@sampatkalyan)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # Create a CDB Oracle database
 - name: Create a CDB Oracle database
   sampatkalyan.oracle_sql.oraclesql_database:
@@ -83,7 +82,7 @@ EXAMPLES = '''
     db_admin_password: Oracle_123
 '''
 
-RETURN = '''
+RETURN = r'''
 changed:
     description: Whether the state of the database was changed.
     type: bool
@@ -100,6 +99,9 @@ db_type:
     description: Type of the database affected (CDB or PDB).
     type: str
 '''
+
+import cx_Oracle
+from ansible.module_utils.basic import AnsibleModule
 
 def run_sql_command(module, conn_str, sql_commands):
     try:

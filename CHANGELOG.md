@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Harmonized `ANSIBLE_METADATA` across all 5 modules (`oracle_sqlloader`, `oracle_sqlplus`, `oraclesql_database`, `oraclesql_table`, `oraclesql_user`) to canonical schema version `1.1` (`preview` status, `community` support).
+- Standardized module headers with `# -*- coding: utf-8 -*-`, `from __future__ import absolute_import, division, print_function`, and `__metaclass__ = type`.
+- Reordered module sections to place imports (`AnsibleModule`, `cx_Oracle`, stdlib) after `RETURN` docstrings across all modules.
+- Aligned `version_added: "0.0.1"` in `oracle_sqlplus` to match collection history.
+- Corrected `oracle_sqlloader` requirements documentation to specify `Oracle Instant Client (sqlldr)` instead of `cx_Oracle`.
+- Synchronized Ansible version requirement in `README.md` to `>= 2.15.0` matching `meta/runtime.yml`.
+
 ## [0.0.2] - 2026-11-06
 
 ### Added

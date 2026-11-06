@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
+    'metadata_version': '1.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
@@ -210,8 +210,8 @@ options:
         type: str
         choices: ['LTRIM', 'RTRIM', 'BOTH', 'NOTRIM']
 requirements:
-    - python >= 2.7/Python 3.6+
-    - cx_Oracle
+    - Python 3.6+
+    - Oracle Instant Client (sqlldr)
 notes:
     - Requires Oracle SQL*Loader to be installed on the target machine.
     - The user running this module must have appropriate permissions to execute SQL*Loader.

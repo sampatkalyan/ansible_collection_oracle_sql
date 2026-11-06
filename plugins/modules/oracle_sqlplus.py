@@ -1,27 +1,19 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2024, Andavarapu Sampat Kalyan <sampatkalyana@gmail.com>
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
-from ansible.module_utils.basic import AnsibleModule
-import os
-import subprocess
-import logging
-import re
-from datetime import datetime
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
-    'metadata_version': '0.2',
+    'metadata_version': '1.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
 
-
-# Initialize logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: oracle_sqlplus
 short_description: Executes Oracle SQL*Plus scripts or raw SQL
@@ -29,7 +21,7 @@ description:
     - This module allows you to execute Oracle SQL*Plus scripts or raw SQL.
     - Supports substitution variables and environment variables.
     - Bind variables are supported only for raw SQL execution.
-version_added: "1.0.0"
+version_added: "0.0.1"
 options:
     username:
         description:
@@ -141,7 +133,7 @@ author:
     - Andavarapu Sampat Kalyan (@sampatkalyan)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # Execute a SQL*Plus script with substitution variables
 - name: Run SQL*Plus script with substitution variables
   sampatkalyan.oracle_sql.oracle_sqlplus:
@@ -176,7 +168,7 @@ EXAMPLES = '''
           myVar: "value"
 '''
 
-RETURN = '''
+RETURN = r'''
 changed:
     description: Indicates whether any changes were made.
     type: bool
@@ -216,6 +208,18 @@ results:
             type: int
             returned: for DML statements
 '''
+
+from datetime import datetime
+import logging
+import os
+import re
+import subprocess
+
+from ansible.module_utils.basic import AnsibleModule
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def validate_input(module):
     """Validate input parameters."""

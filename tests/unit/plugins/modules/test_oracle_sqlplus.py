@@ -2,11 +2,11 @@
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
 import json
+from unittest.mock import patch, MagicMock
 import pytest
+
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
-#import ansible.module_utils.oracle_sqlplus as oracle_sqlplus
-from unittest.mock import patch, MagicMock
 from ansible_collections.sampatkalyan.oracle_sql.plugins.modules import oracle_sqlplus
 
 def set_module_args(args):

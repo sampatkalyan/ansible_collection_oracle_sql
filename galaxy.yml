@@ -19,7 +19,9 @@ build_ignore:
   - .vscode
   - .pytest_cache
   - .github
+  - .venv
   - tests
   - "*.tar.gz"
   - DEVCONTAINER_AND_RELEASE_GUIDE.md
   - SECURITY_AUDIT.md
+  - publish.sh
