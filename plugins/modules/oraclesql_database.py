@@ -11,8 +11,6 @@ ANSIBLE_METADATA = {
     'supported_by': 'community'
 }
 
-#!/usr/bin/python
-
 from ansible.module_utils.basic import AnsibleModule
 import cx_Oracle
 
