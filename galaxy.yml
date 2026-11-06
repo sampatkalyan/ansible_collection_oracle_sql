@@ -14,3 +14,12 @@ repository: https://github.com/sampatkalyan/ansible_collection_oracle_sql
 documentation: https://github.com/sampatkalyan/ansible_collection_oracle_sql/blob/main/README.md
 homepage: https://github.com/sampatkalyan/ansible_collection_oracle_sql
 issues: https://github.com/sampatkalyan/ansible_collection_oracle_sql/issues
+build_ignore:
+  - .devcontainer
+  - .vscode
+  - .pytest_cache
+  - .github
+  - tests
+  - "*.tar.gz"
+  - DEVCONTAINER_AND_RELEASE_GUIDE.md
+  - SECURITY_AUDIT.md
