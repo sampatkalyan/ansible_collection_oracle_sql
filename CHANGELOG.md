@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-11-06
+
 ### Added
 - Comprehensive unit test coverage for all collection modules (`test_oracle_sqlloader.py`, `test_oraclesql_database.py`, `test_oraclesql_table.py`, `test_oraclesql_user.py`, and `test_module_specs.py`), establishing 51 passing unit and specification tests.
 - Cross-platform test compatibility shims (`tests/conftest.py`) allowing tests to run natively on Windows while remaining fully compatible with Linux CI.

@@ -137,3 +137,4 @@ def test_sqlloader_failure(mock_popen, mock_exists):
 
     assert 'SQL*Loader failed' in result.value.args[0]['msg']
     assert result.value.args[0]['rc'] == 1
+

@@ -2,7 +2,7 @@
 
 This Ansible collection provides modules for interacting with Oracle databases.
 
-> **Status**: Alpha (v0.0.2) — APIs may change in future releases.
+> **Status**: Alpha (v0.0.3) — APIs may change in future releases.
 
 ## Modules
 

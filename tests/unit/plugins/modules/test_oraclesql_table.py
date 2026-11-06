@@ -138,3 +138,4 @@ def test_modify_nonexistent_table_fails(mock_connect, mock_makedsn):
         oraclesql_table.main()
 
     assert "Table nonexistent_table does not exist" in result.value.args[0]['msg']
+

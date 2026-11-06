@@ -145,3 +145,4 @@ def test_drop_nonexistent_user(mock_connect):
     data = result.value.args[0]
     assert data['changed'] is False
     assert "User 'app_user' does not exist" in data['msg']
+

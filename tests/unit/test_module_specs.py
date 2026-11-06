@@ -90,3 +90,4 @@ def test_module_passwords_have_no_log(mod_name):
     for opt_name, opt_spec in options.items():
         if isinstance(opt_spec, dict) and 'password' in opt_name.lower():
             assert opt_spec.get('no_log') is True, f"Option '{opt_name}' in {mod_name} documentation must have no_log: true"
+

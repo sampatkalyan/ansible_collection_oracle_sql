@@ -134,3 +134,4 @@ def test_drop_database(mock_connect):
     assert data['changed'] is True
     assert data['state'] == 'absent'
     mock_cursor.execute.assert_called_with("DROP PLUGGABLE DATABASE testpdb")
+
