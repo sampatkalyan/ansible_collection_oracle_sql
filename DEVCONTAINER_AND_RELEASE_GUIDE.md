@@ -146,3 +146,88 @@ git tag -a v0.0.2 -m "Release version 0.0.2: Namespace normalization, documentat
 git push origin main --tags
 ```
 
+
+
+---
+
+# Part 3: Deep Dive — GitHub Actions, CI/CD Architecture & Secret Security
+
+## 1. How GitHub Actions Works Under the Hood
+
+GitHub Actions is an automation platform built directly into GitHub. It works via three core concepts:
+
+1. **Workflows (`.github/workflows/*.yml`)**:
+   YAML files defining what should run, when, and where.
+2. **Triggers (`on:`)**:
+   - `push: tags: ['v*']`: Runs automatically whenever you push a Git tag like `v0.0.2`.
+   - `workflow_dispatch:`: Adds a manual **"Run workflow"** button in the GitHub UI, and allows programmatic execution via the CLI (`gh workflow run release.yml`).
+3. **Hosted Runners (`runs-on: ubuntu-latest`)**:
+   GitHub spins up a fresh, ephemeral Ubuntu Linux virtual machine in Microsoft Azure for each job. When the job finishes, the VM is immediately destroyed.
+
+---
+
+## 2. Why Storing Credentials in GitHub Secrets is the Gold Standard
+
+Never hardcode API keys, passwords, or tokens in scripts, commit messages, or chat conversations. GitHub Secrets provides defense-in-depth through five security pillars:
+
+### A. Asymmetric Encryption at Rest (NaCl / Libsodium)
+When you paste your token into GitHub Secrets, GitHub encrypts it immediately in your browser using public-key cryptography (libsodium Box algorithm). GitHub's servers only hold the encrypted ciphertext; only the ephemeral runner VM spun up during your workflow run has the temporary key to decrypt it.
+
+### B. Automatic Runtime Log Masking
+GitHub Actions inspects all stdout and stderr streams in real-time. If any step prints the decrypted value of a secret, GitHub automatically replaces it with `***` (as seen in our release logs: `GALAXY_API_KEY: ***`). Even if a command accidentally echoes the token, it will never appear in web logs.
+
+### C. Safe Injection via Environment Variables
+Instead of passing sensitive tokens directly in the shell command line:
+```bash
+# BAD: Visible in process table (ps -ef)
+ansible-galaxy collection publish ... --api-key "my-secret-token"
+```
+The workflow injects it as an environment variable into the process:
+```yaml
+env:
+  GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
+run: ansible-galaxy collection publish ... --api-key "$GALAXY_API_KEY"
+```
+
+### D. Zero-Trust for AI Assistants & Collaborators
+By keeping the secret in GitHub:
+- You never have to copy-paste your sensitive token into an AI chat or prompt.
+- The AI can write, inspect, and trigger the workflow pipeline without ever reading or knowing the token value.
+- Pull requests from external forks do not have access to your repository secrets, preventing malicious PRs from stealing your keys.
+
+---
+
+## 3. Galaxy Import Validation Lessons (Gotchas Learned in v0.0.2)
+
+When Galaxy imports a new collection version, it runs rigorous automated checks:
+
+1. **SPDX License Identifiers**:
+   - `license:` in `galaxy.yml` cannot be freeform text like `Apache License 2.0`.
+   - It must be the official SPDX identifier: `Apache-2.0` (or `GPL-3.0-or-later`, `MIT`, etc.).
+2. **`meta/runtime.yml` is Mandatory**:
+   - Galaxy requires a `meta/runtime.yml` file declaring `requires_ansible: '>=2.15.0'`. Without this, Galaxy import fails with `Code: UNKNOWN`.
+3. **Every Module Must Have a `DOCUMENTATION` String**:
+   - Galaxy executes `ansible-doc` on every Python file in `plugins/modules/`.
+   - If a file (such as `oraclesql_user.py`) lacks a `DOCUMENTATION` block, the entire collection import is rejected.
+4. **Module Name in `DOCUMENTATION`**:
+   - In the YAML frontmatter of `DOCUMENTATION = '''...'''`, `module: <name>` must be the short name (`module: oraclesql_database`), NOT the full FQCN (`sampatkalyan.oracle_sql.oraclesql_database`).
+
+---
+
+## 4. Useful GitHub CLI (`gh`) Commands for Workflows
+
+You can trigger and inspect your workflows directly from your terminal:
+
+```bash
+# Trigger a workflow run:
+gh workflow run release.yml --ref main
+
+# List recent runs:
+gh run list --workflow=release.yml
+
+# Watch or view a specific run:
+gh run view <RUN_ID>
+
+# View only the failed steps of a run:
+gh run view <RUN_ID> --log-failed
+```
