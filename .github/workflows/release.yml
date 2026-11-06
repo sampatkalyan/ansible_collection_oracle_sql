@@ -1,0 +1,32 @@
+---
+name: Release and Publish to Galaxy
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build & Publish to Ansible Galaxy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.4.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Ansible Core
+        run: pip install ansible-core
+
+      - name: Build collection
+        run: ansible-galaxy collection build --force
+
+      - name: Publish to Ansible Galaxy
+        env:
+          GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
+        run: ansible-galaxy collection publish sampatkalyan-oracle_sql-*.tar.gz --api-key "$GALAXY_API_KEY"
