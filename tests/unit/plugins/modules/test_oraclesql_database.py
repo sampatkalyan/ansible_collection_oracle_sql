@@ -2,8 +2,19 @@
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
 import json
+import sys
 from unittest.mock import patch, MagicMock
 import pytest
+
+if 'cx_Oracle' not in sys.modules:
+    try:
+        __import__('cx_Oracle')
+    except ImportError:
+        mock_cx = MagicMock()
+        mock_cx.DatabaseError = type('DatabaseError', (Exception,), {})
+        mock_cx.Error = type('Error', (Exception,), {})
+        mock_cx.makedsn = MagicMock(return_value='localhost:1521/ORCL')
+        sys.modules['cx_Oracle'] = mock_cx
 
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
@@ -134,4 +145,22 @@ def test_drop_database(mock_connect):
     assert data['changed'] is True
     assert data['state'] == 'absent'
     mock_cursor.execute.assert_called_with("DROP PLUGGABLE DATABASE testpdb")
+
+
+def test_database_fails_when_cx_oracle_missing(monkeypatch):
+    monkeypatch.setattr(oraclesql_database, 'HAS_CX_ORACLE', False)
+    set_module_args({
+        'db_name': 'testcdb',
+        'state': 'present',
+        'db_type': 'CDB',
+        'oracle_home': '/u01/app/oracle/product/19.0.0/dbhome_1',
+        'oracle_sid': 'testcdb',
+        'db_admin_user': 'sys',
+        'db_admin_password': 'password'
+    })
+    with pytest.raises(AnsibleFailJson) as ex:
+        oraclesql_database.main()
+    msg = ex.value.args[0]['msg']
+    assert "cx_Oracle" in msg
+
 

@@ -85,8 +85,14 @@ msg:
     returned: always
 '''
 
-from ansible.module_utils.basic import AnsibleModule
-import cx_Oracle
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+try:
+    import cx_Oracle
+    HAS_CX_ORACLE = True
+except ImportError:
+    HAS_CX_ORACLE = False
+
 
 def connect_to_oracle(module):
     """
@@ -97,6 +103,7 @@ def connect_to_oracle(module):
         return connection
     except cx_Oracle.DatabaseError as e:
         module.fail_json(msg=f"Failed to connect to Oracle: {e}")
+
 
 def execute_sql_query(module, connection, query, params=None):
     """
@@ -111,6 +118,7 @@ def execute_sql_query(module, connection, query, params=None):
         return cursor
     except cx_Oracle.DatabaseError as e:
         module.fail_json(msg=f"Failed to execute SQL query: {query}. Error: {e}")
+
 
 def create_or_update_user(module, connection):
     """
@@ -159,6 +167,7 @@ def create_or_update_user(module, connection):
             # User does not exist
             module.exit_json(changed=False, msg=f"User '{username}' does not exist")
 
+
 def main():
     module_args = {
         'connect_string': {'type': 'str', 'required': True},
@@ -173,6 +182,9 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_CX_ORACLE:
+        module.fail_json(msg=missing_required_lib('cx_Oracle'))
+
     connection = connect_to_oracle(module)
 
     try:
@@ -182,5 +194,7 @@ def main():
         if connection:
             connection.close()
 
+
 if __name__ == '__main__':
     main()
+

@@ -299,6 +299,7 @@ import subprocess
 
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_sqlloader(module, cmd):
     """
     Run the SQL*Loader command and return the results.
@@ -312,13 +313,14 @@ def run_sqlloader(module, cmd):
     except Exception as e:
         module.fail_json(msg=str(e), cmd=' '.join(cmd))
 
+
 def parse_log_file(log_file):
     """
     Parse the SQL*Loader log file to extract relevant information.
     """
     records_loaded = 0
     records_rejected = 0
-    
+
     if os.path.exists(log_file):
         with open(log_file, 'r') as f:
             content = f.read()
@@ -328,8 +330,9 @@ def parse_log_file(log_file):
             rejected_match = re.search(r'(\d+) Rows not loaded due to data errors', content)
             if rejected_match:
                 records_rejected = int(rejected_match.group(1))
-    
+
     return records_loaded, records_rejected
+
 
 def run_module():
     module_args = dict(
@@ -472,8 +475,11 @@ def run_module():
 
     module.exit_json(**result)
 
+
 def main():
     run_module()
 
+
 if __name__ == '__main__':
     main()
+

@@ -286,8 +286,14 @@ table:
     }
 '''
 
-import cx_Oracle
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+try:
+    import cx_Oracle
+    HAS_CX_ORACLE = True
+except ImportError:
+    HAS_CX_ORACLE = False
+
 
 def create_table(cursor, table_info):
     table_name = table_info.get('table_name') or table_info.get('name')
@@ -301,13 +307,13 @@ def create_table(cursor, table_info):
         if col.get('check'):
             col_def += f" CHECK ({col['check']})"
         columns.append(col_def)
-    
+
     primary_key = next((col['name'] for col in table_info.get('columns', []) if col.get('primary_key')), None)
     if primary_key:
         columns.append(f"CONSTRAINT pk_{table_name} PRIMARY KEY ({primary_key})")
-    
+
     query = f"CREATE {'TEMPORARY ' if table_info.get('temporary') else ''}TABLE {table_name} ({', '.join(columns)})"
-    
+
     if table_info.get('tablespace'):
         query += f" TABLESPACE {table_info['tablespace']}"
     if table_info.get('partitioning'):
@@ -328,23 +334,26 @@ def create_table(cursor, table_info):
         query += f" PARALLEL {table_info['parallel']}"
     if table_info.get('row_movement'):
         query += " ENABLE ROW MOVEMENT"
-    
+
     cursor.execute(query)
-    
+
     for col in table_info.get('columns', []):
         if col.get('comment'):
             cursor.execute(f"COMMENT ON COLUMN {table_name}.{col['name']} IS '{col['comment']}'")
-    
+
     if table_info.get('comment'):
         cursor.execute(f"COMMENT ON TABLE {table_name} IS '{table_info['comment']}'")
 
+
 def drop_table(cursor, table_name):
     cursor.execute(f"DROP TABLE {table_name} PURGE")
+
 
 def table_exists(cursor, table_name):
     query = "SELECT table_name FROM user_tables WHERE table_name = :name"
     cursor.execute(query, name=table_name.upper())
     return cursor.fetchone() is not None
+
 
 def get_existing_columns(cursor, table_name):
     query = """
@@ -363,6 +372,7 @@ def get_existing_columns(cursor, table_name):
         'comment': row[7]
     } for row in cursor.fetchall()}
 
+
 def get_existing_constraints(cursor, table_name):
     query = """
     SELECT constraint_name, constraint_type, column_name, search_condition, r_constraint_name
@@ -377,6 +387,7 @@ def get_existing_constraints(cursor, table_name):
         'condition': row[3],
         'reference': row[4]
     } for row in cursor.fetchall()}
+
 
 def get_existing_indexes(cursor, table_name):
     query = """
@@ -397,11 +408,12 @@ def get_existing_indexes(cursor, table_name):
         indexes[row[0]]['columns'].append(row[3])
     return indexes
 
+
 def modify_table(cursor, table_name, desired_state):
     existing_columns = get_existing_columns(cursor, table_name)
     existing_constraints = get_existing_constraints(cursor, table_name)
     existing_indexes = get_existing_indexes(cursor, table_name)
-    
+
     # Modify columns
     for col in desired_state['columns']:
         if col['name'] not in existing_columns:
@@ -423,25 +435,39 @@ def modify_table(cursor, table_name, desired_state):
                     cursor.execute(f"ALTER TABLE {table_name} MODIFY {col['name']} DEFAULT NULL")
             if existing_col['comment'] != col.get('comment'):
                 cursor.execute(f"COMMENT ON COLUMN {table_name}.{col['name']} IS '{col.get('comment', '')}'")
-    
+
     # Remove columns that are not in the desired state
     for col_name in existing_columns:
         if col_name not in [col['name'] for col in desired_state['columns']]:
             cursor.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_name}")
 
     # Manage constraints
-    desired_constraints = {f"pk_{table_name}": {'type': 'PRIMARY KEY', 'column': next((col['name'] for col in desired_state['columns'] if col.get('primary_key')), None)}}
+    pk_col = next((col['name'] for col in desired_state['columns'] if col.get('primary_key')), None)
+    desired_constraints = {f"pk_{table_name}": {'type': 'PRIMARY KEY', 'column': pk_col}}
     for col in desired_state['columns']:
         if col.get('unique'):
             desired_constraints[f"uk_{table_name}_{col['name']}"] = {'type': 'UNIQUE', 'column': col['name']}
         if col.get('check'):
-            desired_constraints[f"ck_{table_name}_{col['name']}"] = {'type': 'CHECK', 'column': col['name'], 'condition': col['check']}
+            desired_constraints[f"ck_{table_name}_{col['name']}"] = {
+                'type': 'CHECK',
+                'column': col['name'],
+                'condition': col['check']
+            }
 
     for constraint in existing_constraints.values():
-        if constraint['type'] in ['PRIMARY KEY', 'UNIQUE', 'CHECK']:
-            if constraint['column'] not in [col['name'] for col in desired_state['columns']] or \
-               constraint['type'] not in [c['type'] for c in desired_constraints.values()] or \
-               (constraint['type'] == 'CHECK' and constraint['condition'] != next((c['condition'] for c in desired_constraints.values() if c['type'] == 'CHECK' and c['column'] == constraint['column']), None)):
+        c_type = constraint['type']
+        if c_type in ['PRIMARY KEY', 'UNIQUE', 'CHECK']:
+            col_match = constraint['column'] in [col['name'] for col in desired_state['columns']]
+            type_match = c_type in [c['type'] for c in desired_constraints.values()]
+            check_mismatch = False
+            if c_type == 'CHECK':
+                matching_check = next(
+                    (c['condition'] for c in desired_constraints.values()
+                     if c['type'] == 'CHECK' and c['column'] == constraint['column']),
+                    None
+                )
+                check_mismatch = (constraint['condition'] != matching_check)
+            if not col_match or not type_match or check_mismatch:
                 cursor.execute(f"ALTER TABLE {table_name} DROP CONSTRAINT {constraint['name']}")
 
     for constraint_name, constraint in desired_constraints.items():
@@ -503,7 +529,7 @@ def modify_table(cursor, table_name, desired_state):
         cursor.execute(f"ALTER TABLE {table_name} {'COMPRESS' if desired_state['compress'] else 'NOCOMPRESS'}")
     if desired_state.get('row_movement') is not None:
         cursor.execute(f"ALTER TABLE {table_name} {'ENABLE' if desired_state['row_movement'] else 'DISABLE'} ROW MOVEMENT")
-    
+
     # Update table comment
     if desired_state.get('comment'):
         cursor.execute(f"COMMENT ON TABLE {table_name} IS '{desired_state['comment']}'")
@@ -511,8 +537,10 @@ def modify_table(cursor, table_name, desired_state):
     # Note: Modifying partitioning scheme is complex and often requires recreating the table
     # This implementation doesn't handle partition modifications for existing tables
 
+
 def gather_table_stats(cursor, table_name):
     cursor.execute(f"BEGIN DBMS_STATS.GATHER_TABLE_STATS(ownname => USER, tabname => '{table_name}'); END;")
+
 
 def run_module():
     module_args = dict(
@@ -570,6 +598,9 @@ def run_module():
         supports_check_mode=True
     )
 
+    if not HAS_CX_ORACLE:
+        module.fail_json(msg=missing_required_lib('cx_Oracle'))
+
     hostname = module.params['hostname']
     port = module.params['port']
     service_name = module.params['service_name']
@@ -621,8 +652,11 @@ def run_module():
 
     module.exit_json(**result)
 
+
 def main():
     run_module()
 
+
 if __name__ == '__main__':
     main()
+

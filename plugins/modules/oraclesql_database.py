@@ -100,8 +100,14 @@ db_type:
     type: str
 '''
 
-import cx_Oracle
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+try:
+    import cx_Oracle
+    HAS_CX_ORACLE = True
+except ImportError:
+    HAS_CX_ORACLE = False
+
 
 def run_sql_command(module, conn_str, sql_commands):
     try:
@@ -114,25 +120,28 @@ def run_sql_command(module, conn_str, sql_commands):
         error, = e.args
         module.fail_json(msg=error.message, code=error.code)
 
+
 def create_database(module, db_type, db_name, oracle_home, oracle_sid, db_admin_user, db_admin_password):
     if db_type == 'CDB':
         sql_commands = [f"CREATE DATABASE {db_name} ENABLE PLUGGABLE DATABASE"]
     elif db_type == 'PDB':
         sql_commands = [f"CREATE PLUGGABLE DATABASE {db_name}"]
-    
+
     conn_str = f"{db_admin_user}/{db_admin_password}@{oracle_sid}"
     run_sql_command(module, conn_str, sql_commands)
     module.exit_json(changed=True, msg=f"{db_type} {db_name} created.", db_name=db_name, state='present', db_type=db_type)
+
 
 def drop_database(module, db_type, db_name, oracle_home, oracle_sid, db_admin_user, db_admin_password):
     if db_type == 'CDB':
         sql_commands = [f"DROP DATABASE {db_name}"]
     elif db_type == 'PDB':
         sql_commands = [f"DROP PLUGGABLE DATABASE {db_name}"]
-    
+
     conn_str = f"{db_admin_user}/{db_admin_password}@{oracle_sid}"
     run_sql_command(module, conn_str, sql_commands)
     module.exit_json(changed=True, msg=f"{db_type} {db_name} dropped.", db_name=db_name, state='absent', db_type=db_type)
+
 
 def main():
     module_args = dict(
@@ -150,6 +159,9 @@ def main():
         supports_check_mode=True
     )
 
+    if not HAS_CX_ORACLE:
+        module.fail_json(msg=missing_required_lib('cx_Oracle'))
+
     db_name = module.params['db_name']
     state = module.params['state']
     db_type = module.params['db_type']
@@ -163,5 +175,7 @@ def main():
     elif state == 'absent':
         drop_database(module, db_type, db_name, oracle_home, oracle_sid, db_admin_user, db_admin_password)
 
+
 if __name__ == '__main__':
     main()
+

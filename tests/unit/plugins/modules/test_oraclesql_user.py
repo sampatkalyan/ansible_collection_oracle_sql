@@ -2,8 +2,19 @@
 # Apache License 2.0 (see LICENSE or http://www.apache.org/licenses/LICENSE-2.0)
 
 import json
+import sys
 from unittest.mock import patch, MagicMock
 import pytest
+
+if 'cx_Oracle' not in sys.modules:
+    try:
+        __import__('cx_Oracle')
+    except ImportError:
+        mock_cx = MagicMock()
+        mock_cx.DatabaseError = type('DatabaseError', (Exception,), {})
+        mock_cx.Error = type('Error', (Exception,), {})
+        mock_cx.makedsn = MagicMock(return_value='localhost:1521/ORCL')
+        sys.modules['cx_Oracle'] = mock_cx
 
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
@@ -145,4 +156,19 @@ def test_drop_nonexistent_user(mock_connect):
     data = result.value.args[0]
     assert data['changed'] is False
     assert "User 'app_user' does not exist" in data['msg']
+
+
+def test_user_fails_when_cx_oracle_missing(monkeypatch):
+    monkeypatch.setattr(oraclesql_user, 'HAS_CX_ORACLE', False)
+    set_module_args({
+        'connect_string': 'sys/password@localhost:1521/ORCL',
+        'username': 'app_user',
+        'password': 'dummy_password',
+        'state': 'present'
+    })
+    with pytest.raises(AnsibleFailJson) as ex:
+        oraclesql_user.main()
+    msg = ex.value.args[0]['msg']
+    assert "cx_Oracle" in msg
+
 

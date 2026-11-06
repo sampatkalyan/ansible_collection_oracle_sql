@@ -221,6 +221,7 @@ from ansible.module_utils.basic import AnsibleModule
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def validate_input(module):
     """Validate input parameters."""
     if not module.params['script'] and not module.params['raw_sql'] and not module.params['loop']:
@@ -230,6 +231,7 @@ def validate_input(module):
     if module.params['script'] and not os.path.exists(module.params['script']):
         module.fail_json(msg=f"SQL file {module.params['script']} not found")
 
+
 def check_sqlplus_installed(module):
     """Check if SQL*Plus is installed."""
     try:
@@ -238,6 +240,7 @@ def check_sqlplus_installed(module):
         module.fail_json(msg=f"SQL*Plus not installed or not found in PATH. Error: {e.stderr.decode('utf-8')}")
     except FileNotFoundError:
         module.fail_json(msg="SQL*Plus not installed or not found in PATH.")
+
 
 def execute_sqlplus(module, result):
     """Execute SQL*Plus command."""
@@ -315,6 +318,7 @@ def execute_sqlplus(module, result):
     # Parse output for more detailed results
     result['results'].extend(parse_sqlplus_output(result['sqlplus_output'], page_size))
 
+
 def parse_sqlplus_output(output, page_size):
     """Parse SQL*Plus output for more structured results."""
     results = []
@@ -357,6 +361,7 @@ def parse_sqlplus_output(output, page_size):
 
     return results
 
+
 def run_module():
     module_args = dict(
         username=dict(type='str', required=False),
@@ -395,7 +400,7 @@ def run_module():
     try:
         validate_input(module)
         check_sqlplus_installed(module)
-        
+
         if module.params['loop']:
             for item in module.params['loop']:
                 temp_params = module.params.copy()
@@ -414,8 +419,10 @@ def run_module():
 
     module.exit_json(**result)
 
+
 def main():
     run_module()
+
 
 if __name__ == '__main__':
     main()
